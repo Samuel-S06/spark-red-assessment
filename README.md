@@ -1,4 +1,4 @@
-# 🎬 Spark Red Movie Project
+# Spark Red Movie Project
 
 ---
 
