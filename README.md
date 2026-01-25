@@ -20,6 +20,9 @@ This website provides a seamless movie discovery experience powered by the TMDB 
 
 ### 4. Details for Running Project
 
+### Deployment Link: https://spark-red-movies.vercel.app/login
+
+### Google Drive Link to Demo: 
 
 ### Detailed Local Setup Instructions
 
