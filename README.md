@@ -1,36 +1,41 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Spark Red Movie Project
 
-## Getting Started
+---
 
-First, run the development server:
+### 1. Project Summary
+This website provides a seamless movie discovery experience powered by the TMDB (The Movie Database) API. It allows users to search for thousands of titles, explore genres, and view detailed movie metadata in a "Netflix-inspired" dark-red-ish mode interface.
 
+### 2. Key Features
+* **Supabase Authentication:** Secure user sign-in and protected route handling using Next.js route groups.
+* **Tailwind v4 "Netflix"-inspired UI:** Custom "Spark Red" branding with responsive grid-to-list layout toggles.
+* **Optimized Search:** Real-time movie discovery with input debouncing to minimize API overhead.
+* **Fluid Data Handling:** Dynamic client-side sorting (Rating/Year/Relevance) and Framer Motion layout animations!
+
+### 3. Development Time
+* **Total Time:** Approximately 7-8 hours.
+* **Breakdown:** * Setup & API Integration: 2 hours
+    * UI/UX Styling & Tailwind v4 Migration: 4 hours
+    * Refining TypeScript logic & Sorting: 2 hours
+
+### 4. Details for Running Project
+
+
+### 🚀 Detailed Local Setup Instructions
+
+Follow these steps to get the application running on your local machine.
+
+#### 1. Prerequisites
+* **Node.js 18.20.0** or higher
+* **npm** (comes with Node.js)
+* A valid **TMDB API Key** and **Supabase Project** credentials
+
+#### 2. Clone and Install
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+# Clone the repository
+git clone <your-repository-url>
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+# Navigate into the directory
+cd spark-red-assessment
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+# Install all dependencies
+npm install
