@@ -33,7 +33,7 @@ Follow these steps to get the application running on your local machine.
 #### 2. Clone and Install
 ```bash
 # Clone the repository
-git clone <your-repository-url>
+git clone https://github.com/Samuel-S06/spark-red-assessment.git
 
 # Navigate into the directory
 cd spark-red-assessment
