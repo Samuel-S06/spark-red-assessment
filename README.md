@@ -13,14 +13,15 @@ This website provides a seamless movie discovery experience powered by the TMDB 
 
 ### 3. Development Time
 * **Total Time:** Approximately 7-8 hours.
-* **Breakdown:** * Setup & API Integration: 2 hours
-    * UI/UX Styling & Tailwind v4 Migration: 4 hours
-    * Refining TypeScript logic & Sorting: 2 hours
+* **Breakdown:**
+   * Setup & API Integration: 2 hours
+   * UI/UX Styling & Tailwind v4 Migration: 4 hours
+   * Refining TypeScript logic & Sorting: 2 hours
 
 ### 4. Details for Running Project
 
 
-### 🚀 Detailed Local Setup Instructions
+### Detailed Local Setup Instructions
 
 Follow these steps to get the application running on your local machine.
 
