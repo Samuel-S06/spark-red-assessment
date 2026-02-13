@@ -2,9 +2,11 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Search, TrendingUp, Clock, Star, Filter, Grid, List } from "lucide-react";
+import { Search, TrendingUp, Clock, Star, Filter, Grid, List, RefreshCw, AlertCircle } from "lucide-react";
 import MovieCard from "@/components/MovieCard";
+import MovieSkeleton from "@/components/MovieSkeleton";
 import { Movie } from "./types";
+import { useMovieCache } from "@/hooks/useMovieCache";
 
 const DEBOUNCE_MS = 350;
 
@@ -15,19 +17,33 @@ export default function Home() {
   const [error, setError] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [sortBy, setSortBy] = useState<"relevance" | "rating" | "year">("relevance");
+  const [retryCount, setRetryCount] = useState(0);
+  const { get, set: setCache } = useMovieCache();
 
   const fetchMovies = useCallback(async (q: string) => {
     if (!q.trim()) return;
+    
+    // Check cache first
+    const cached = get(q);
+    if (cached) {
+      setMovies(cached);
+      setLoading(false);
+      setError(null);
+      return;
+    }
+
     setLoading(true);
     setError(null);
+    setRetryCount(0);
+    
     try {
       const res = await fetch(`/api/movies?query=${encodeURIComponent(q.trim())}`);
       const data = await res.json();
+      
       if (!res.ok) {
-        setError(data?.error ?? "Failed to fetch movies");
-        setMovies([]);
-        return;
+        throw new Error(data?.error ?? "Failed to fetch movies");
       }
+      
       let movieArray = Array.isArray(data) ? data : [];
       
       // Sort movies based on selected criteria
@@ -38,13 +54,14 @@ export default function Home() {
       }
       
       setMovies(movieArray);
-    } catch {
-      setError("Failed to fetch movies");
+      setCache(q, movieArray); // Cache the results
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to fetch movies");
       setMovies([]);
     } finally {
       setLoading(false);
     }
-  }, [sortBy]);
+  }, [get, setCache, sortBy]);
 
   useEffect(() => {
     fetchMovies("Action");
@@ -55,6 +72,11 @@ export default function Home() {
     const t = setTimeout(() => fetchMovies(query), DEBOUNCE_MS);
     return () => clearTimeout(t);
   }, [query, fetchMovies]);
+
+  const handleRetry = () => {
+    setRetryCount(prev => prev + 1);
+    fetchMovies(query);
+  };
 
   const popularSearches = ["Action", "Comedy", "Drama", "Sci-Fi", "Thriller", "Romance"];
 
@@ -89,13 +111,17 @@ export default function Home() {
                 type="search"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
+                onFocus={() => setQuery("")} // Clear cache indicator on focus
                 placeholder="Search movies, actors, genres..."
                 aria-label="Search movies"
                 className="w-full bg-zinc-900/60 border border-white/[0.06] rounded-3xl py-4 sm:py-5 pl-14 pr-6 text-lg text-white placeholder-zinc-500 focus:border-sparkRed/50 focus:ring-2 focus:ring-sparkRed/20 outline-none transition-all duration-200 shadow-lg"
               />
               {query && (
                 <button
-                  onClick={() => setQuery("")}
+                  onClick={() => {
+                    setQuery("");
+                    setCache(query, []); // Clear cache when manually cleared
+                  }}
                   className="absolute right-5 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-white transition-colors"
                 >
                   ×
@@ -161,6 +187,7 @@ export default function Home() {
             {movies.length > 0 && (
               <div className="text-zinc-500 text-sm">
                 Found <span className="text-white font-medium">{movies.length}</span> movies
+                {query && <span className="ml-2 text-xs text-sparkRed bg-sparkRed/10 px-2 py-1 rounded-full">★</span>}
               </div>
             )}
           </div>
@@ -174,21 +201,18 @@ export default function Home() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="flex flex-col items-center justify-center py-24 gap-6"
+              className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-6"
             >
-              <motion.div
-                animate={{ rotate: 360 }}
-                transition={{ repeat: Infinity, duration: 0.9, ease: "linear" }}
-                className="relative"
-              >
-                <div className="w-12 h-12 border-2 border-zinc-700 border-t-sparkRed rounded-full" />
+              {[...Array(10)].map((_, i) => (
                 <motion.div
-                  animate={{ scale: [1, 1.2, 1] }}
-                  transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
-                  className="absolute inset-0 border-2 border-transparent border-t-sparkRed rounded-full"
-                />
-              </motion.div>
-              <p className="text-zinc-500 font-medium">Searching for amazing movies...</p>
+                  key={i}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: i * 0.1, duration: 0.3 }}
+                >
+                  <MovieSkeleton />
+                </motion.div>
+              ))}
             </motion.div>
           ) : error ? (
             <motion.div
@@ -199,17 +223,29 @@ export default function Home() {
               className="rounded-3xl bg-zinc-900/40 border border-white/[0.06] px-8 py-16 text-center max-w-2xl mx-auto"
             >
               <div className="w-16 h-16 rounded-2xl bg-red-500/10 border border-red-500/20 flex items-center justify-center mx-auto mb-6">
-                <span className="text-2xl">⚠️</span>
+                <AlertCircle className="w-8 h-8 text-red-400" />
               </div>
               <h3 className="text-xl font-semibold text-white mb-2">Something went wrong</h3>
               <p className="text-zinc-400 mb-4">{error}</p>
-              <p className="text-zinc-500 text-sm">Check TMDB_API_KEY in .env.local</p>
-              <button
-                onClick={() => fetchMovies(query)}
-                className="mt-6 px-6 py-3 bg-sparkRed hover:bg-red-600 text-white font-medium rounded-xl transition-colors"
-              >
-                Try Again
-              </button>
+              <p className="text-zinc-500 text-sm mb-6">TMDB API might be temporarily unavailable</p>
+              <div className="flex gap-3 justify-center">
+                <button
+                  onClick={handleRetry}
+                  className="px-6 py-3 bg-sparkRed hover:bg-red-600 text-white font-medium rounded-xl transition-colors shadow-glow-sm"
+                >
+                  <RefreshCw size={16} className="mr-2" />
+                  {retryCount > 0 ? `Retry (${retryCount})` : "Try Again"}
+                </button>
+                <button
+                  onClick={() => {
+                    setError(null);
+                    setMovies([]);
+                  }}
+                  className="px-6 py-3 bg-zinc-800 hover:bg-zinc-700 text-white font-medium rounded-xl transition-colors"
+                >
+                  Clear
+                </button>
+              </div>
             </motion.div>
           ) : movies.length === 0 ? (
             <motion.div

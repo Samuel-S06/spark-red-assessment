@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import Link from "next/link";
 import { Star, ChevronRight, Calendar, Clock } from "lucide-react";
 import { Movie } from "../app/(protected)/types";
+import { useFavorites } from "@/hooks/useFavorites";
 
 export default function MovieCard({ 
   movie, 
@@ -12,6 +13,18 @@ export default function MovieCard({
   movie: Movie; 
   viewMode?: "grid" | "list";
 }) {
+  const { isFavorite, addFavorite, removeFavorite } = useFavorites();
+
+  const handleFavoriteClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (isFavorite(movie.id)) {
+      removeFavorite(movie.id);
+    } else {
+      addFavorite(movie.id);
+    }
+  };
+
   if (viewMode === "list") {
     return (
       <motion.article
@@ -52,9 +65,23 @@ export default function MovieCard({
                     </span>
                   </div>
                   
-                  <span className="inline-flex items-center gap-1.5 text-sparkRed font-medium text-sm py-2 px-4 rounded-xl bg-white/10 hover:bg-white/15 transition-colors">
-                    Details <ChevronRight size={14} />
-                  </span>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={handleFavoriteClick}
+                      className={`p-2 rounded-lg transition-colors ${
+                        isFavorite(movie.id)
+                          ? "text-sparkRed bg-sparkRed/20"
+                          : "text-zinc-400 hover:text-sparkRed"
+                      }`}
+                      aria-label={isFavorite(movie.id) ? "Remove from favorites" : "Add to favorites"}
+                    >
+                      <Star size={16} fill={isFavorite(movie.id) ? "currentColor" : "none"} />
+                    </button>
+                    
+                    <span className="inline-flex items-center gap-1.5 text-sparkRed font-medium text-sm py-2 px-4 rounded-xl bg-white/10 hover:bg-white/15 transition-colors">
+                      Details <ChevronRight size={14} />
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -82,9 +109,23 @@ export default function MovieCard({
               <p className="text-xs text-zinc-300 mb-2 sm:mb-3 line-clamp-3 leading-relaxed">
                 {movie.desc}
               </p>
-              <span className="inline-flex items-center justify-center gap-1.5 text-sparkRed font-medium text-sm py-2 rounded-xl bg-white/10 hover:bg-white/15 transition-colors w-full">
-                Details <ChevronRight size={14} />
-              </span>
+              <div className="flex items-center justify-between gap-2">
+                <button
+                  onClick={handleFavoriteClick}
+                  className={`p-1.5 rounded-lg transition-colors ${
+                    isFavorite(movie.id)
+                      ? "text-sparkRed bg-sparkRed/20"
+                      : "text-zinc-400 hover:text-sparkRed"
+                  }`}
+                  aria-label={isFavorite(movie.id) ? "Remove from favorites" : "Add to favorites"}
+                >
+                  <Star size={14} fill={isFavorite(movie.id) ? "currentColor" : "none"} />
+                </button>
+                
+                <span className="inline-flex items-center justify-center gap-1.5 text-sparkRed font-medium text-sm py-2 rounded-xl bg-white/10 hover:bg-white/15 transition-colors w-full">
+                  Details <ChevronRight size={14} />
+                </span>
+              </div>
             </div>
             {/* Mobile: always-visible tappable CTA */}
             <div className="sm:hidden absolute bottom-2 left-2 right-2">
@@ -94,10 +135,23 @@ export default function MovieCard({
             </div>
           </div>
           <div className="p-3 sm:p-4">
-            <h3 className="font-medium text-sm sm:text-base text-white truncate group-hover:text-sparkRed transition-colors duration-200">
-              {movie.title}
-            </h3>
-            <div className="flex justify-between items-center mt-1.5 text-xs text-zinc-500 font-medium">
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="font-medium text-sm sm:text-base text-white truncate group-hover:text-sparkRed transition-colors duration-200">
+                {movie.title}
+              </h3>
+              <button
+                onClick={handleFavoriteClick}
+                className={`p-1.5 rounded-lg transition-colors ${
+                  isFavorite(movie.id)
+                    ? "text-sparkRed bg-sparkRed/20"
+                    : "text-zinc-400 hover:text-sparkRed"
+                }`}
+                aria-label={isFavorite(movie.id) ? "Remove from favorites" : "Add to favorites"}
+              >
+                <Star size={14} fill={isFavorite(movie.id) ? "currentColor" : "none"} />
+              </button>
+            </div>
+            <div className="flex justify-between items-center text-xs text-zinc-500 font-medium">
               <span>{movie.year}</span>
               <span className="flex items-center gap-1 text-amber-400/90">
                 <Star size={12} fill="currentColor" /> {movie.rating.toFixed(1)}

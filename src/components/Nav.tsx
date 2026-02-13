@@ -3,19 +3,23 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
-import { LogOut, User, Settings, Film } from "lucide-react";
+import { LogOut, User, Settings, Film, Heart } from "lucide-react";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useFavorites } from "@/hooks/useFavorites";
 
 export default function Nav() {
   const pathname = usePathname();
   const { user, loading, signOut } = useAuth();
+  const { favorites } = useFavorites();
   const [showUserMenu, setShowUserMenu] = useState(false);
 
   const handleSignOut = async () => {
     setShowUserMenu(false);
     await signOut();
   };
+
+  const isFavoritesPage = pathname === "/favorites";
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-zinc-950/80 backdrop-blur-2xl border-b border-white/[0.06]">
@@ -75,6 +79,17 @@ export default function Nav() {
                       </div>
                       
                       <div className="p-2">
+                        <Link
+                          href="/favorites"
+                          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-zinc-300 hover:text-white hover:bg-white/[0.06] transition-colors"
+                        >
+                          <Heart size={16} className="text-sparkRed" />
+                          My Favorites
+                          <span className="ml-auto text-xs text-zinc-500">
+                            {favorites.length > 0 && `(${favorites.length})`}
+                          </span>
+                        </Link>
+                        
                         <button
                           onClick={() => {
                             setShowUserMenu(false);
